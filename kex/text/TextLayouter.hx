@@ -10,14 +10,18 @@ class TextLayouter {
 				lines: [],
 				width: 0,
 				height: 0,
+				lineHeight: 0,
 			}
 		}
+
+		var lineHeight = font.height();
 
 		if (areaWidth <= 0) {
 			return {
 				lines: [content],
 				width: font.width(content),
 				height: font.height(),
+				lineHeight: lineHeight,
 			}
 		}
 
@@ -68,6 +72,7 @@ class TextLayouter {
 			lines: lines,
 			width: maxTextWidth,
 			height: font.height() * lines.length,
+			lineHeight: lineHeight,
 		}
 	}
 }

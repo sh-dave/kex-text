@@ -4,4 +4,5 @@ typedef TextLayout = {
 	lines: Array<String>,
 	width: Float,
 	height: Float,
+	lineHeight: Float,
 }
