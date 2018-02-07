@@ -1,7 +1,18 @@
 package kex.text;
 
+typedef TextLayouterOpts = {
+	maxCharactersPerLine: Int,
+}
+
 class TextLayouter {
-	public function new() {
+	var opts: TextLayouterOpts;
+
+	static var defaultOpts = {
+		maxCharactersPerLine: 66,
+	}
+
+	public function new( ?opts ) {
+		this.opts = opts != null ? opts : defaultOpts;
 	}
 
 	public function layout( content: String, font: FontInfo, areaWidth: Float ) : TextLayout {
@@ -17,9 +28,11 @@ class TextLayouter {
 		var lineHeight = font.height();
 
 		if (areaWidth <= 0) {
+			var width = font.width(content);
+
 			return {
-				lines: [content],
-				width: font.width(content),
+				lines: [{ width: width, content: content }],
+				width: width,
 				height: font.height(),
 				lineHeight: lineHeight,
 			}
@@ -28,12 +41,12 @@ class TextLayouter {
 		var maxWidth = areaWidth;
 		var maxTextWidth = 0.0;
 		var textWidth = 0.0;
-		var lines: Array<String> = [];
+		var lines: Array<TextLine> = [];
 
 		for (line in content.split('\n')) {
 			var lineWidth = font.width(line);
 
-			if (lineWidth > maxWidth) {
+			if (lineWidth > maxWidth || line.length > opts.maxCharactersPerLine) {
 				var words = Lambda.list(line.split(' '));
 
 				while (!words.isEmpty()) {
@@ -43,15 +56,29 @@ class TextLayouter {
 					maxTextWidth = Math.max(maxTextWidth, textWidth);
 					var nextWord = words.pop();
 
-					while (nextWord != null && (lineWidth = font.width('$line $nextWord')) <= maxWidth) {
+					while (true) {
+						if (nextWord == null) {
+							break;
+						}
+
+						var nextLine = '$line $nextWord';
+
+						if (nextLine.length > opts.maxCharactersPerLine) {
+							break;
+						}
+
+						if ((lineWidth = font.width(nextLine)) > maxWidth) {
+							break;
+						}
+
 						textWidth = Math.max(textWidth, lineWidth);
 						maxTextWidth = Math.max(maxTextWidth, textWidth);
-						line = '$line $nextWord';
+						line = nextLine;
 						nextWord = words.pop();
 					}
 
 					if (line != '') {
-						lines.push('$line');
+						lines.push({ content: line, width: lineWidth });
 					}
 
 					if (nextWord != null) {
@@ -63,7 +90,7 @@ class TextLayouter {
 				maxTextWidth = Math.max(maxTextWidth, textWidth);
 
 				if (line != '') {
-					lines.push(line);
+					lines.push({ content: line, width: lineWidth });
 				}
 			}
 		}

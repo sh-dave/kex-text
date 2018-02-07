@@ -1,7 +1,7 @@
 package kex.text;
 
 typedef TextLayout = {
-	lines: Array<String>,
+	lines: Array<TextLine>,
 	width: Float,
 	height: Float,
 	lineHeight: Float,
