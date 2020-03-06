@@ -1,6 +1,6 @@
 package kex.text;
 
 typedef TextLine = {
-	width: Float,
-	content: String,
+	final width: Float;
+	final content: String;
 }

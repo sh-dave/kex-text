@@ -1,34 +1,33 @@
 package kex.text;
 
 typedef TextLayouterOpts = {
-	maxCharactersPerLine: Int,
+	final ?maxCharactersPerLine: Int;
+	final ?keepNewlines: Bool;
 }
 
 class TextLayouter {
-	var opts: TextLayouterOpts;
+	final MaxCharactersPerLine: Int;
+	final KeepNewlines: Bool;
 
-	static var defaultOpts = {
-		maxCharactersPerLine: 66,
-	}
-
-	public function new( ?opts ) {
-		this.opts = opts != null ? opts : defaultOpts;
+	public function new( ?opts: TextLayouterOpts ) {
+		MaxCharactersPerLine = opts != null && opts.maxCharactersPerLine != null ? opts.maxCharactersPerLine : 66;
+		KeepNewlines = opts != null && opts.keepNewlines != null ? opts.keepNewlines : true;
 	}
 
 	public function layout( content: String, font: FontInfo, areaWidth: Float ) : TextLayout {
+		final lineHeight = font.height();
+
 		if (content == null || content.length == 0) {
 			return {
-				lines: [],
+				lines: KeepNewlines ? [{ content: '', width: 0}] : [],
 				width: 0,
-				height: 0,
-				lineHeight: 0,
+				height: KeepNewlines ? lineHeight : 0,
+				lineHeight: KeepNewlines ? lineHeight : 0,
 			}
 		}
 
-		var lineHeight = font.height();
-
 		if (areaWidth <= 0) {
-			var width = font.width(content);
+			final width = font.width(content);
 
 			return {
 				lines: [{ width: width, content: content }],
@@ -38,15 +37,15 @@ class TextLayouter {
 			}
 		}
 
-		var maxWidth = areaWidth;
+		final maxWidth = areaWidth;
 		var maxTextWidth = 0.0;
 		var textWidth = 0.0;
-		var lines: Array<TextLine> = [];
+		final lines: Array<TextLine> = [];
 
 		for (line in content.split('\n')) {
 			var lineWidth = font.width(line);
 
-			if (lineWidth > maxWidth || line.length > opts.maxCharactersPerLine) {
+			if (lineWidth > maxWidth || line.length > MaxCharactersPerLine) {
 				var words = Lambda.list(line.split(' '));
 
 				while (!words.isEmpty()) {
@@ -61,9 +60,9 @@ class TextLayouter {
 							break;
 						}
 
-						var nextLine = '$line $nextWord';
+						final nextLine = '$line $nextWord';
 
-						if (nextLine.length > opts.maxCharactersPerLine) {
+						if (nextLine.length > MaxCharactersPerLine) {
 							break;
 						}
 
