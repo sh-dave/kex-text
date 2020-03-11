@@ -1,6 +1,6 @@
 package kex.text;
 
-typedef TextLine = {
-	final width: Float;
-	final content: String;
+@:structInit class TextLine {
+	public final width: Float;
+	public final content: String;
 }

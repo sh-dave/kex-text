@@ -1,8 +1,8 @@
 package kex.text;
 
-typedef TextLayout = {
-	final lines: Array<TextLine>;
-	final width: Float;
-	final height: Float;
-	final lineHeight: Float;
+@:structInit class TextLayout {
+	public final lines: Array<TextLine>;
+	public final width: Float;
+	public final height: Float;
+	public final lineHeight: Float;
 }

@@ -1,21 +1,15 @@
 package kex.text;
 
-typedef TextLayouterOpts = {
+typedef LayoutOpts = {
 	final ?maxCharactersPerLine: Int;
 	final ?keepNewlines: Bool;
 }
 
 class TextLayouter {
-	final MaxCharactersPerLine: Int;
-	final KeepNewlines: Bool;
-
-	public function new( ?opts: TextLayouterOpts ) {
-		MaxCharactersPerLine = opts != null && opts.maxCharactersPerLine != null ? opts.maxCharactersPerLine : 66;
-		KeepNewlines = opts != null && opts.keepNewlines != null ? opts.keepNewlines : true;
-	}
-
-	public function layout( content: String, font: FontInfo, areaWidth: Float ) : TextLayout {
-		final lineHeight = font.height();
+	public static function layout( content: String, metrics: FontMetrics, areaWidth: Float, ?opts: LayoutOpts ) : TextLayout {
+		final MaxCharactersPerLine = opts != null && opts.maxCharactersPerLine != null ? opts.maxCharactersPerLine : 66;
+		final KeepNewlines = opts != null && opts.keepNewlines != null ? opts.keepNewlines : true;
+		final lineHeight = metrics.calculateHeight();
 
 		if (content == null || content.length == 0) {
 			return {
@@ -27,12 +21,12 @@ class TextLayouter {
 		}
 
 		if (areaWidth <= 0) {
-			final width = font.width(content);
+			final width = metrics.calculateWidth(content);
 
 			return {
 				lines: [{ width: width, content: content }],
 				width: width,
-				height: font.height(),
+				height: lineHeight,
 				lineHeight: lineHeight,
 			}
 		}
@@ -43,14 +37,14 @@ class TextLayouter {
 		final lines: Array<TextLine> = [];
 
 		for (line in content.split('\n')) {
-			var lineWidth = font.width(line);
+			var lineWidth = metrics.calculateWidth(line);
 
 			if (lineWidth > maxWidth || line.length > MaxCharactersPerLine) {
 				var words = Lambda.list(line.split(' '));
 
 				while (!words.isEmpty()) {
 					line = words.pop();
-					lineWidth = font.width(line);
+					lineWidth = metrics.calculateWidth(line);
 					textWidth = Math.max(textWidth, lineWidth);
 					maxTextWidth = Math.max(maxTextWidth, textWidth);
 					var nextWord = words.pop();
@@ -66,7 +60,7 @@ class TextLayouter {
 							break;
 						}
 
-						if ((lineWidth = font.width(nextLine)) > maxWidth) {
+						if ((lineWidth = metrics.calculateWidth(nextLine)) > maxWidth) {
 							break;
 						}
 
@@ -97,7 +91,7 @@ class TextLayouter {
 		return {
 			lines: lines,
 			width: maxTextWidth,
-			height: font.height() * lines.length,
+			height: lineHeight * lines.length,
 			lineHeight: lineHeight,
 		}
 	}
