@@ -3,13 +3,15 @@ package kex.text;
 typedef LayoutOpts = {
 	final ?maxCharactersPerLine: Int;
 	final ?keepNewlines: Bool;
+	final ?lineSpacing: Float;
 }
 
 class TextLayouter {
 	public static function layout( content: String, metrics: FontMetrics, areaWidth: Float, ?opts: LayoutOpts ) : TextLayout {
 		final MaxCharactersPerLine = opts != null && opts.maxCharactersPerLine != null ? opts.maxCharactersPerLine : 66;
 		final KeepNewlines = opts != null && opts.keepNewlines != null ? opts.keepNewlines : true;
-		final lineHeight = metrics.calculateHeight();
+		final lineSpacing = opts != null && opts.lineSpacing != null ? opts.lineSpacing : 1.0;
+		final lineHeight = metrics.calculateHeight() * lineSpacing;
 
 		if (content == null || content.length == 0) {
 			return {
