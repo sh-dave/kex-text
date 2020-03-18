@@ -11,7 +11,7 @@ class TextLayouter {
 		final MaxCharactersPerLine = opts != null && opts.maxCharactersPerLine != null ? opts.maxCharactersPerLine : 66;
 		final KeepNewlines = opts != null && opts.keepNewlines != null ? opts.keepNewlines : true;
 		final lineSpacing = opts != null && opts.lineSpacing != null ? opts.lineSpacing : 1.0;
-		final lineHeight = metrics.calculateHeight() * lineSpacing;
+		final lineHeight = metrics.measureHeight() * lineSpacing;
 
 		if (content == null || content.length == 0) {
 			return {
@@ -23,7 +23,7 @@ class TextLayouter {
 		}
 
 		if (areaWidth <= 0) {
-			final width = metrics.calculateWidth(content);
+			final width = metrics.measureWidth(content);
 
 			return {
 				lines: [{ width: width, content: content }],
@@ -39,14 +39,14 @@ class TextLayouter {
 		final lines: Array<TextLine> = [];
 
 		for (line in content.split('\n')) {
-			var lineWidth = metrics.calculateWidth(line);
+			var lineWidth = metrics.measureWidth(line);
 
 			if (lineWidth > maxWidth || line.length > MaxCharactersPerLine) {
 				var words = Lambda.list(line.split(' '));
 
 				while (!words.isEmpty()) {
 					line = words.pop();
-					lineWidth = metrics.calculateWidth(line);
+					lineWidth = metrics.measureWidth(line);
 					textWidth = Math.max(textWidth, lineWidth);
 					maxTextWidth = Math.max(maxTextWidth, textWidth);
 					var nextWord = words.pop();
@@ -62,7 +62,7 @@ class TextLayouter {
 							break;
 						}
 
-						if ((lineWidth = metrics.calculateWidth(nextLine)) > maxWidth) {
+						if ((lineWidth = metrics.measureWidth(nextLine)) > maxWidth) {
 							break;
 						}
 

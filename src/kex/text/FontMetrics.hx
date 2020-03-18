@@ -1,6 +1,6 @@
 package kex.text;
 
 typedef FontMetrics = {
-	function calculateWidth( s: String ) : Float;
-	function calculateHeight() : Float;
+	function measureWidth( s: String ) : Float;
+	function measureHeight() : Float;
 }
