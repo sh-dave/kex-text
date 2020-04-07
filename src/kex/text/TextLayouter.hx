@@ -1,13 +1,7 @@
 package kex.text;
 
-typedef LayoutOpts = {
-	final ?maxCharactersPerLine: Int;
-	final ?keepNewlines: Bool;
-	final ?lineSpacing: Float;
-}
-
 class TextLayouter {
-	public static function layout( content: String, metrics: FontMetrics, areaWidth: Float, ?opts: LayoutOpts ) : TextLayout {
+	public static function layout( content: String, metrics: FontMetrics, areaWidth: Float, ?opts: TextLayoutOpts ) : TextLayout {
 		final MaxCharactersPerLine = opts != null && opts.maxCharactersPerLine != null ? opts.maxCharactersPerLine : 66;
 		final KeepNewlines = opts != null && opts.keepNewlines != null ? opts.keepNewlines : true;
 		final lineSpacing = opts != null && opts.lineSpacing != null ? opts.lineSpacing : 1.0;
@@ -62,10 +56,12 @@ class TextLayouter {
 							break;
 						}
 
-						if ((lineWidth = metrics.measureWidth(nextLine)) > maxWidth) {
+						final tmpWidth = metrics.measureWidth(nextLine);
+						if (tmpWidth > maxWidth) {
 							break;
 						}
 
+						lineWidth = tmpWidth;
 						textWidth = Math.max(textWidth, lineWidth);
 						maxTextWidth = Math.max(maxTextWidth, textWidth);
 						line = nextLine;
